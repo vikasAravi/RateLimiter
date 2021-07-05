@@ -24,10 +24,9 @@ import com.api.ratelimiter.service.EmployeeService;
 @RestController
 public class EmployeeRestController {
 
-	private final static int LIMIT = 3; // change the limit accordingly
+	private final static int LIMIT = 5; // change the limit accordingly
 	private final static String ERROR_CODE = "900";
 	private final static String ERROR_DESCRIPTION = "LIMIT EXCEEDED";
-	
 
 	@Autowired(required = false)
 	private EmployeeService empService;
@@ -46,22 +45,23 @@ public class EmployeeRestController {
 		return response;
 	}
 
-	
 	/**
 	 * @param apiId( unique key from the request )
 	 * @param empId
 	 * @return employee with empId
 	 */
 	@GetMapping("{apiId}/getEmployee/{empId}")
-	public ResponseWrapperClass<Employee> getEmployee(@PathVariable("apiId") String apiId, @PathVariable(name = "empId") Long empId) {
+	public ResponseWrapperClass<Employee> getEmployee(@PathVariable("apiId") String apiId,
+			@PathVariable(name = "empId") Long empId) {
+		// consider this endpoint as tenant
 		Map<String, Integer> requestMap = scheduler.getRequestMap();
 		ResponseWrapperClass<Employee> response = new ResponseWrapperClass<>();
-		if (requestMap.containsKey(apiId) && requestMap.get(apiId) > LIMIT) {
+		scheduler.addRequestToMap(apiId);
+		if (requestMap.get(apiId) > (LIMIT)) {
 			response.setErrorCode(ERROR_CODE);
 			response.setErrorDescription(ERROR_DESCRIPTION);
 			return response;
 		}
-		scheduler.addRequestToMap(apiId);
 		Employee employee = empService.getEmployee(empId);
 		response.setData(employee);
 		return response;
