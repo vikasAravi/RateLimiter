@@ -19,7 +19,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class SchedulerClass {
 	
-	private final static long FIXED_RATE = 100000;
+	private final static long FIXED_RATE = 60*60*1000; // change the time accordingly
 
 	/**
 	 * 1. Schedule a Job which runs for every 1 hour 2. Maintain an Hashmap whcih
